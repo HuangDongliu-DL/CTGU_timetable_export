@@ -1,32 +1,35 @@
-#coding=utf-8
+# coding=utf-8
 import sys
 import getopt
 
-from time_calculation import Calculation
+from schedule_export import schedule_export
+
 
 def usage():
     print(
-    """请输入完整参数
+        """请输入完整参数
     -h:显示帮助
     -u:学号
     -p:密码
-    -y:学年
-    -t:学期""".replace(" ",''))
+    """.replace(" ", ''))
+
+
 # 获取参数
 argv = sys.argv
 # 如果没有获取到任何参数，显示提示
 if len(argv) == 1:
     usage()
     sys.exit()
+
 # 检测是否成功获取到参数
 try:
-    opts,args = getopt.getopt(argv[1:],"u:p:y:t:h")
+    opts, args = getopt.getopt(argv[1:], "u:p:h")
 except getopt.GetoptError:
     usage()
     sys.exit()
 
-username,password,year,term = None,None,None,None
-for opt,arg in opts:
+username, password = None, None
+for opt, arg in opts:
     if opt == '-h':
         usage()
         sys.exit()
@@ -34,13 +37,12 @@ for opt,arg in opts:
         username = arg
     elif opt == '-p':
         password = arg
-    elif opt == '-y':
-        year = arg
-    elif opt == '-t':
-        term = arg
 # 检测参数是否完整
-if None in [username,password,year,term]:
+if None in [username, password]:
     usage()
     sys.exit()
-Calculation(username=username,password=password,shool_year=year,term=term)
-
+r = schedule_export(username=username, password=password)
+if r['status'] == 0:
+    print("恭喜您导出成功")
+else:
+    print("错误：%s" % r['error'])
